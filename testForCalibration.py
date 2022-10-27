@@ -82,7 +82,8 @@ def test_model(generator, save_dir, cfg):
     gts_motion_3D = []
     while not generator.is_epoch_end():
         data = generator()  # Generator sometimes returns none, is it random?
-        if data is None:
+        it = it + 1
+        if data is None:    # 253 times the generated data is not none, the remaining 1124-253 are u.u
             continue
         seq_name, frame = data['seq'], data['frame']
         frame = int(frame)  # not all frames arent secuencial
@@ -97,15 +98,15 @@ def test_model(generator, save_dir, cfg):
         samples_motion_3D.append(sample_motion_3D)
         gts_motion_3D.append(gt_motion_3D)
 
-        it = it + 1
+    print("Total iterations:{}".format(it))
 
-    samples_motion_3D = np.array(samples_motion_3D, dtype=Tensor)   # Getting an error here u.u
-    gts_motion_3D = np.array(gts_motion_3D, dtype=Tensor)           # Getting an error here u.u
-    print(samples_motion_3D.shape)
-    print(gts_motion_3D.shape)
+    final_samples_motion_3D = torch.stack(samples_motion_3D)   # Getting an error here u.u
+    final_gts_motion_3D = torch.stack(gts_motion_3D)           # Getting an error here u.u
+    print(final_samples_motion_3D.shape)
+    print(final_gts_motion_3D.shape)
 
     """save samples"""
-    save_data_for_calibration(data=sample_motion_3D, gt=gt_motion_3D,save_dir=save_dir)
+    save_data_for_calibration(data=final_samples_motion_3D, gt=final_gts_motion_3D,save_dir=save_dir)
     print('Generator different from none: %s\r' % (it)) # turns out it=253 at the end
 
 if __name__ == '__main__':
